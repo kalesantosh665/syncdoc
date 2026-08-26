@@ -1,0 +1,542 @@
+/* =========================================
+   SyncDoc - Document Editor
+========================================= */
+
+.editor-page {
+  min-height: 100vh;
+  background: #070b16;
+  color: #f8fafc;
+  padding: 32px 24px 60px;
+  box-sizing: border-box;
+}
+
+.editor-container {
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+/* =========================================
+   Top Bar
+========================================= */
+
+.editor-topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 24px;
+}
+
+.back-button {
+  text-decoration: none;
+  color: #b98cff;
+  font-weight: 600;
+  font-size: 15px;
+  transition: color 0.2s ease;
+}
+
+.back-button:hover {
+  color: #d4b4ff;
+}
+
+.editor-topbar > div {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+/* =========================================
+   Save Button
+========================================= */
+
+.save-button {
+  border: none;
+  background: linear-gradient(135deg, #7c3aed, #9333ea);
+  color: white;
+  padding: 11px 18px;
+  border-radius: 9px;
+  cursor: pointer;
+  font-weight: 600;
+  box-shadow: 0 6px 18px rgba(124, 58, 237, 0.25);
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    opacity 0.2s ease;
+}
+
+.save-button:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 22px rgba(124, 58, 237, 0.35);
+}
+
+.save-button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.saved-message {
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* =========================================
+   Document Header
+========================================= */
+
+.editor-header {
+  background: #111827;
+  border: 1px solid #252d3d;
+  border-radius: 16px;
+  padding: 32px;
+  margin-bottom: 20px;
+  box-sizing: border-box;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18);
+}
+
+.document-title-input {
+  width: 100%;
+  box-sizing: border-box;
+  border: none;
+  outline: none;
+  font-size: 42px;
+  font-weight: 750;
+  color: #f8fafc;
+  background: transparent;
+  line-height: 1.2;
+}
+
+.document-title-input::placeholder {
+  color: #64748b;
+}
+
+.document-owner {
+  color: #94a3b8;
+  margin-top: 12px;
+  margin-bottom: 0;
+  font-size: 14px;
+}
+
+/* =========================================
+   Online Collaborators
+========================================= */
+
+.editor-topbar span {
+  white-space: nowrap;
+}
+
+.editor-page > .editor-container > div:nth-child(2) {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.editor-page > .editor-container > div:nth-child(2) span {
+  background: #17112a !important;
+  border: 1px solid #39235e;
+  padding: 6px 11px !important;
+  border-radius: 999px;
+  font-size: 12px !important;
+}
+
+/* =========================================
+   Blocks
+========================================= */
+
+.editor-block {
+  width: 100%;
+  background: #111827;
+  border: 1px solid #252d3d;
+  border-radius: 14px;
+  padding: 22px;
+  margin-bottom: 16px;
+  box-sizing: border-box;
+  overflow: hidden;
+  position: relative;
+  cursor: grab;
+
+  transition:
+    opacity 0.15s ease,
+    transform 0.15s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.editor-block:hover {
+  border-color: #3b2a58;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.editor-block:active {
+  cursor: grabbing;
+}
+
+.editor-block.dragging {
+  opacity: 0.45;
+  transform: scale(0.98);
+  border-color: #8b5cf6;
+}
+
+/* =========================================
+   Drag Handle
+========================================= */
+
+.drag-handle {
+  width: 30px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  margin-bottom: 12px;
+
+  color: #64748b;
+  background: #0d1320;
+  border: 1px solid #293246;
+  border-radius: 7px;
+
+  font-size: 16px;
+  font-weight: 700;
+
+  cursor: grab;
+  user-select: none;
+
+  transition:
+    background 0.15s ease,
+    color 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.drag-handle:hover {
+  color: #c084fc;
+  background: #1b1230;
+  border-color: #7c3aed;
+}
+
+.drag-handle:active {
+  cursor: grabbing;
+}
+
+/* =========================================
+   Block Actions
+========================================= */
+
+.block-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid #202938;
+  flex-wrap: wrap;
+}
+
+.move-block-button {
+  border: 1px solid #30394b;
+  background: #0d1320;
+  color: #cbd5e1;
+  padding: 7px 12px;
+  border-radius: 7px;
+  cursor: pointer;
+  font-size: 13px;
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease;
+}
+
+.move-block-button:hover:not(:disabled) {
+  background: #17112a;
+  border-color: #7c3aed;
+  color: #c084fc;
+}
+
+.move-block-button:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.delete-block-button {
+  border: 1px solid #5b2730;
+  background: #241217;
+  color: #f87171;
+  padding: 7px 12px;
+  border-radius: 7px;
+  cursor: pointer;
+  font-size: 13px;
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.delete-block-button:hover {
+  background: #35171d;
+  border-color: #ef4444;
+}
+
+/* =========================================
+   Add Block
+========================================= */
+
+.add-block {
+  background: #111827;
+  border: 1px solid #252d3d;
+  border-radius: 14px;
+  padding: 24px;
+  margin-top: 24px;
+  box-sizing: border-box;
+  text-align: center;
+}
+
+.add-block h3 {
+  margin: 0 0 18px;
+  color: #e2e8f0;
+  font-size: 18px;
+}
+
+.add-block-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.add-block-button {
+  border: 1px solid #353d4e;
+  background: #0d1320;
+  color: #cbd5e1;
+  padding: 10px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.add-block-button:hover {
+  background: #1b1230;
+  border-color: #8b5cf6;
+  color: #c084fc;
+  transform: translateY(-1px);
+}
+
+/* =========================================
+   Block Editing Presence
+========================================= */
+
+.editor-block > div[style] {
+  background: #17112a !important;
+  border: 1px solid #4c2a72;
+}
+/* =================================
+   Dark Theme - Block Text Fix
+================================= */
+
+.editor-block input,
+.editor-block textarea,
+.editor-block [contenteditable="true"] {
+  color: #f8fafc !important;
+  background: transparent;
+  caret-color: #a855f7;
+}
+
+.editor-block input::placeholder,
+.editor-block textarea::placeholder {
+  color: #64748b;
+}
+
+/* Heading text */
+.editor-block h1,
+.editor-block h2,
+.editor-block h3 {
+  color: #f8fafc !important;
+}
+
+/* Paragraph text */
+.editor-block p {
+  color: #e2e8f0 !important;
+}
+
+/* Code text */
+.editor-block pre,
+.editor-block code {
+  color: #e2e8f0;
+}
+/* =================================
+   Export Buttons
+================================= */
+
+.export-button {
+  border: 1px solid #353d4e;
+  background: #0d1320;
+  color: #cbd5e1;
+  padding: 10px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.export-button:hover {
+  transform: translateY(-1px);
+}
+
+.export-html-button:hover {
+  background: #101f1b;
+  border-color: #10b981;
+  color: #34d399;
+}
+
+.export-pdf-button:hover {
+  background: #241217;
+  border-color: #ef4444;
+  color: #f87171;
+}
+@media (max-width: 600px) {
+  .export-button {
+    padding: 9px 11px;
+    font-size: 12px;
+  }
+}
+/* =========================================
+   Tablet
+========================================= */
+
+@media (max-width: 800px) {
+  .editor-page {
+    padding: 26px 16px 50px;
+  }
+
+  .editor-header {
+    padding: 25px;
+  }
+
+  .document-title-input {
+    font-size: 34px;
+  }
+
+  .editor-block {
+    padding: 18px;
+  }
+}
+
+/* =========================================
+   Mobile
+========================================= */
+
+@media (max-width: 600px) {
+  .editor-page {
+    padding: 18px 12px 40px;
+  }
+
+  .editor-topbar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 14px;
+    margin-bottom: 20px;
+  }
+
+  .editor-topbar > div {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .back-button {
+    font-size: 14px;
+  }
+
+  .save-button {
+    padding: 9px 14px;
+    font-size: 13px;
+  }
+
+  .saved-message {
+    font-size: 12px;
+  }
+
+  .editor-header {
+    padding: 20px;
+    border-radius: 12px;
+  }
+
+  .document-title-input {
+    font-size: 28px;
+  }
+
+  .document-owner {
+    font-size: 14px;
+  }
+
+  .editor-block {
+    padding: 15px;
+    border-radius: 11px;
+  }
+
+  .add-block {
+    padding: 18px;
+  }
+
+  .add-block-buttons {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  .add-block-button {
+    width: 100%;
+    padding: 10px 8px;
+    font-size: 13px;
+  }
+}
+
+/* =========================================
+   Small Mobile
+========================================= */
+
+@media (max-width: 400px) {
+  .editor-page {
+    padding: 14px 8px 30px;
+  }
+
+  .editor-header {
+    padding: 16px;
+  }
+
+  .document-title-input {
+    font-size: 24px;
+  }
+
+  .editor-block {
+    padding: 12px;
+  }
+
+  .add-block {
+    padding: 15px;
+  }
+
+  .add-block-buttons {
+    grid-template-columns: 1fr;
+  }
+
+  .editor-topbar > div {
+    align-items: flex-start;
+  }
+
+  .save-button {
+    padding: 8px 12px;
+  }
+}

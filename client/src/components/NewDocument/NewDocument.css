@@ -1,0 +1,161 @@
+.new-document-page {
+  min-height: 100vh;
+  background: #080b16;
+  color: #f8fafc;
+  padding: 40px;
+}
+
+.new-document-container {
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+.back-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  background: transparent;
+  border: none;
+
+  color: #a78bfa;
+  font-size: 15px;
+
+  cursor: pointer;
+  margin-bottom: 30px;
+}
+
+.new-document-card {
+  background: #111625;
+  border: 1px solid #252b3d;
+  border-radius: 18px;
+
+  padding: 40px;
+
+  box-shadow:
+    0 20px 50px rgba(0, 0, 0, 0.3);
+}
+
+.new-document-icon {
+  width: 60px;
+  height: 60px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 14px;
+
+  background: linear-gradient(
+    135deg,
+    #7c3aed,
+    #a855f7
+  );
+
+  color: white;
+  font-size: 24px;
+
+  margin-bottom: 20px;
+}
+
+.new-document-card h1 {
+  margin: 0 0 8px;
+
+  font-size: 32px;
+}
+
+.new-document-card > p {
+  color: #94a3b8;
+  margin-bottom: 32px;
+}
+
+.form-group {
+  margin-bottom: 22px;
+}
+
+.form-group label {
+  display: block;
+
+  margin-bottom: 8px;
+
+  font-size: 14px;
+  font-weight: 600;
+
+  color: #cbd5e1;
+}
+
+.form-group input {
+  width: 100%;
+  box-sizing: border-box;
+
+  padding: 14px 16px;
+
+  border-radius: 10px;
+  border: 1px solid #30384d;
+
+  background: #0c101c;
+  color: #f8fafc;
+
+  font-size: 15px;
+
+  outline: none;
+}
+
+.form-group input:focus {
+  border-color: #8b5cf6;
+
+  box-shadow:
+    0 0 0 3px rgba(139, 92, 246, 0.15);
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+
+  margin-top: 30px;
+}
+
+.cancel-button,
+.create-button {
+  padding: 12px 20px;
+
+  border-radius: 9px;
+
+  font-size: 14px;
+  font-weight: 600;
+
+  cursor: pointer;
+}
+
+.cancel-button {
+  background: transparent;
+  color: #cbd5e1;
+
+  border: 1px solid #374151;
+}
+
+.create-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  background: linear-gradient(
+    135deg,
+    #7c3aed,
+    #9333ea
+  );
+
+  color: white;
+
+  border: none;
+}
+
+.create-button:hover {
+  opacity: 0.9;
+}
+
+.create-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
