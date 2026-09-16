@@ -4,6 +4,7 @@ import {
   useState,
   type DragEvent,
   type FocusEvent,
+  type CSSProperties,
 } from "react";
 
 import { Link } from "react-router-dom";
@@ -32,10 +33,17 @@ interface DocumentEditorProps {
   document: SyncDocument;
 }
 
+interface CursorPosition {
+  blockId: string;
+  selectionStart: number;
+  selectionEnd: number;
+}
+
 interface OnlineUser {
   name: string;
   color?: string;
   editingBlockId?: string | null;
+  cursor?: CursorPosition | null;
 }
 
 function DocumentEditor({
@@ -172,6 +180,12 @@ function DocumentEditor({
       null
     );
 
+    // Initially no cursor/selection is shared
+    awareness.setLocalStateField(
+      "cursor",
+      null
+    );
+
     // --------------------------------
     // WebSocket
     // --------------------------------
@@ -205,6 +219,8 @@ function DocumentEditor({
               editingBlockId:
                 state.editingBlockId ??
                 null,
+              cursor:
+                state.cursor ?? null,
             });
           }
         });
@@ -570,6 +586,97 @@ function DocumentEditor({
   };
 
   // --------------------------------
+  // Cursor / Selection Presence
+  // --------------------------------
+
+  const setCursorPosition = (
+    blockId: string,
+    selectionStart: number,
+    selectionEnd: number
+  ) => {
+    const awareness =
+      awarenessRef.current;
+
+    if (!awareness) {
+      return;
+    }
+
+    awareness.setLocalStateField(
+      "cursor",
+      {
+        blockId,
+        selectionStart,
+        selectionEnd,
+      }
+    );
+  };
+
+  const clearCursorPosition = () => {
+    const awareness =
+      awarenessRef.current;
+
+    if (!awareness) {
+      return;
+    }
+
+    awareness.setLocalStateField(
+      "cursor",
+      null
+    );
+  };
+
+  // --------------------------------
+  // Remote Cursor Helpers
+  // --------------------------------
+
+  const getRemoteCursorStyle = (
+    blockId: string,
+    cursor: CursorPosition
+  ): CSSProperties | null => {
+    if (
+      cursor.blockId !== blockId
+    ) {
+      return null;
+    }
+
+    // The exact pixel position inside a native textarea cannot be
+    // reliably calculated from another browser's DOM. We therefore
+    // use a block-relative marker whose horizontal position is
+    // proportional to the remote cursor offset.
+    const block = document.blocks.find(
+      (item) => item._id === blockId
+    );
+
+    if (!block) {
+      return null;
+    }
+
+    const contentLength =
+      block.content?.length ?? 0;
+
+    const ratio =
+      contentLength > 0
+        ? Math.min(
+            1,
+            Math.max(
+              0,
+              cursor.selectionStart /
+                contentLength
+            )
+          )
+        : 0;
+
+    return {
+      left: `calc(8px + ${ratio * 84}%)`,
+      top: "8px",
+      borderLeft:
+        `2px solid ${
+          "inherit"
+        }`,
+    };
+  };
+
+  // --------------------------------
   // Block Blur
   // --------------------------------
 
@@ -591,6 +698,7 @@ function DocumentEditor({
     }
 
     setEditingBlock(null);
+    clearCursorPosition();
   };
 
   // --------------------------------
@@ -1356,6 +1464,9 @@ const exportDocument = (
                     : ""
                 }`}
                 key={block._id}
+                style={{
+                  position: "relative",
+                }}
                 onDragOver={
                   handleDragOver
                 }
@@ -1372,6 +1483,36 @@ const exportDocument = (
                     block._id
                   )
                 }
+
+                onSelect={(event) => {
+                  const target = event.target;
+
+                  if (
+                    target instanceof HTMLInputElement ||
+                    target instanceof HTMLTextAreaElement
+                  ) {
+                    setCursorPosition(
+                      block._id,
+                      target.selectionStart ?? 0,
+                      target.selectionEnd ?? 0
+                    );
+                  }
+                }}
+
+                onKeyUp={(event) => {
+                  const target = event.target;
+
+                  if (
+                    target instanceof HTMLInputElement ||
+                    target instanceof HTMLTextAreaElement
+                  ) {
+                    setCursorPosition(
+                      block._id,
+                      target.selectionStart ?? 0,
+                      target.selectionEnd ?? 0
+                    );
+                  }
+                }}
 
                 onBlurCapture={(
                   event
@@ -1451,6 +1592,105 @@ const exportDocument = (
                       is editing
                     </div>
                   ))}
+
+                {/* --------------------------------
+                    Remote Cursor / Selection
+                    -------------------------------- */}
+
+                {onlineUsers
+                  .filter(
+                    (user) =>
+                      user.cursor &&
+                      user.cursor.blockId ===
+                        block._id
+                  )
+                  .map((user) => {
+                    const cursor =
+                      user.cursor;
+
+                    if (!cursor) {
+                      return null;
+                    }
+
+                    const style =
+                      getRemoteCursorStyle(
+                        block._id,
+                        cursor
+                      );
+
+                    if (!style) {
+                      return null;
+                    }
+
+                    const hasSelection =
+                      cursor.selectionEnd !==
+                      cursor.selectionStart;
+
+                    return (
+                      <div
+                        key={`cursor-${user.name}`}
+                        title={`${user.name} cursor`}
+                        style={{
+                          position:
+                            "absolute",
+                          ...style,
+                          height:
+                            "24px",
+                          zIndex: 5,
+                          pointerEvents:
+                            "none",
+                        }}
+                      >
+                        <span
+                          style={{
+                            position:
+                              "absolute",
+                            top: "-18px",
+                            left: "-2px",
+                            padding:
+                              "2px 6px",
+                            borderRadius:
+                              "8px",
+                            background:
+                              user.color ||
+                              "#2563eb",
+                            color:
+                              "#ffffff",
+                            fontSize:
+                              "10px",
+                            fontWeight:
+                              700,
+                            whiteSpace:
+                              "nowrap",
+                          }}
+                        >
+                          {user.name}
+                        </span>
+
+                        {hasSelection && (
+                          <span
+                            style={{
+                              position:
+                                "absolute",
+                              top: 0,
+                              left: 0,
+                              width:
+                                "18px",
+                              height:
+                                "24px",
+                              background:
+                                user.color ||
+                                "#2563eb",
+                              opacity:
+                                0.18,
+                              borderRadius:
+                                "3px",
+                            }}
+                          />
+                        )}
+                      </div>
+                    );
+                  })}
 
                 {/* --------------------------------
                     Drag Handle
